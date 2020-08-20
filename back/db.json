@@ -1,0 +1,23 @@
+{
+  "todoItems": [
+    {
+      "done": true,
+      "selected": false,
+      "content": "Купить сахар",
+      "id": 1,
+      "edited": false
+    },
+    {
+      "done": false,
+      "selected": false,
+      "content": "Уехать из страны - раз",
+      "id": 2
+    },
+    {
+      "done": false,
+      "selected": false,
+      "content": "Удариться в бега - два",
+      "id": 3
+    }
+  ]
+}
