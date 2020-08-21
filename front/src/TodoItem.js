@@ -1,17 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import Context from './Context';
 // import { updateTodo } from "./requestManager.js";
 
 export default function TodoItem (props) {
-	// const [value, setValue] = React.useState(props.todo.content)
-
 	const [editMode, setEditMode] = useState(false)
-
-	// const saveTodo = e => {
-	// 	if (e.key === 'Enter') {
-	// 		setEditMode(false)
-	// 		updateTodo(props.todo)
-	// 	}
-	// }
+	const [input, setInput] = useState(props.todo.content)
+	const { dispatch } = useContext(Context)
 
 	if (editMode) {
 		return (
@@ -19,11 +13,21 @@ export default function TodoItem (props) {
 				<input 
 					type="text" 
 					className="form-control" 
-					value={props.todo.content}
-					onChange={e => props.editTodo({
-						...props.todo,
-						content: e.target.value
-					})}
+					value={input}
+					onChange={e => setInput(e.target.value)}
+					onKeyUp={e => {
+						if (e.key === 'Enter') {
+							setEditMode(false)
+
+							dispatch({
+								type: 'UPDATE',
+								payload: {
+									...props.todo,
+									content: input
+								}
+							})
+						}
+					}}
 					/* 
 						Если нужно вызвать функцию с тем же набором параметров,
 						что и её обёртка, можно просто передать саму функцию. 
@@ -38,9 +42,7 @@ export default function TodoItem (props) {
 	return (
 		<li 
 			className="list-group-item d-flex justify-content-between"
-			// onDoubleClick={e => props.editTodo(props.todo.id)}
 			onDoubleClick={() => setEditMode(true)}
-			// onDoubleClick={() => console.log('fired')}
 		>
 			<label>
 				{/* У input'а должен быть обработчик события onChange. */}
@@ -48,7 +50,7 @@ export default function TodoItem (props) {
 					type="checkbox" 
 					className="mr-3" 
 					checked={props.todo.selected} 
-					onChange={e => props.dispatch({
+					onChange={e => dispatch({
 						type: "SET_SELECT",
 						payload: {
 							id: props.todo.id,
@@ -56,7 +58,9 @@ export default function TodoItem (props) {
 						}
 					})} 
 				/>
-				<span className={props.todo.done ? "item-done" : ""}>{props.todo.content}</span>
+				<span className={props.todo.done ? "item-done" : ""}>
+					{props.todo.content}
+				</span>
 			</label>
 			<small className="text-muted">12.04.2020</small>
 		</li>

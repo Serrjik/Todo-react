@@ -15,8 +15,6 @@ export default function TodoList (props) {
 		<TodoItem 
 			todo={todo} 
 			key={todo.id} 
-			dispatch={props.dispatch} 
-			// changeTodo={props.changeTodo} 
 		/>
 	))
 

@@ -1,14 +1,16 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, createContext } from 'react';
 import AppHeader from './AppHeader';
 import TodoList from './TodoList';
 import { getAll, createTodo, updateTodo, removeTodo } from './requestManager';
+
 import useTodos from './useTodos';
+import Context from './Context';
 
 // Всё, что возвращает функция, попадает на страницу.
 function App() {
-	/* 
+	/*
 		React.useState создаёт реактивные переменные.
-		Массив todos. Функция setTodos, через которую можно вызывать изменения. 
+		Массив todos. Функция setTodos, через которую можно вызывать изменения.
 	*/
 	// const [todos, setTodos] = useState([
 		// { id: 1, content: "Купить хлеб", done: false, selected: true },
@@ -21,11 +23,11 @@ function App() {
 
 	const [todos, dispatch] = useTodos()
 
-	/* 
-		Хук useEffect принимает 2 параметра. 1-ый - функция, которая вызывается 
+	/*
+		Хук useEffect принимает 2 параметра. 1-ый - функция, которая вызывается
 		каждый раз, когда изменяется что-нибудь из массива 2-ого параметра.
-		Если 2-ой параметр - пустой, 
-		функция из 1-го аргумента вызывается только 1 раз. 
+		Если 2-ой параметр - пустой,
+		функция из 1-го аргумента вызывается только 1 раз.
 	*/
 	// useEffect(
 	// 	() => {
@@ -42,9 +44,9 @@ function App() {
 	// Отображать ли кнопки действий?
 	const [showActions, setShowActions] = useState(true)
 
-	/* 
-		Хук useEffect принимает 2 параметра. 1-ый - функция, которая вызывается 
-		каждый раз, когда изменяется что-нибудь из массива 2-ого параметра. 
+	/*
+		Хук useEffect принимает 2 параметра. 1-ый - функция, которая вызывается
+		каждый раз, когда изменяется что-нибудь из массива 2-ого параметра.
 	*/
 	useEffect(
 		() => {
@@ -75,9 +77,9 @@ function App() {
 	// 	setTodos([...todos])
 	// }
 
-	/* 
-		Функция обрабатывает завершение редактирования задачи 
-		(по потере фокуса, или нажатию "Enter"). 
+	/*
+		Функция обрабатывает завершение редактирования задачи
+		(по потере фокуса, или нажатию "Enter").
 	*/
 	const changeTodo = (todoId, value) => {
 		const todo = todos.find(todo => todo.id === todoId)
@@ -99,7 +101,7 @@ function App() {
 	// 			updateTodo(todo)
 	// 		}
 	// 	}
-	
+
 	// 	// setTodos([...todos])
 	// }
 
@@ -114,26 +116,20 @@ function App() {
 		// }))
 	// }
 
-	/* 
-		В React по договоренности функции-обработчики 
-		именуются начиная с "handler". 
+	/*
+		В React по договоренности функции-обработчики
+		именуются начиная с "handler".
 	*/
 	const handlerNewTodo = e => {
 		if (e.key === 'Enter') {
-			const todo = {
+			dispatch.create({
 				// id: 1 + Math.max(0, ...todos.map(todo => todo.id)),
 				done: false,
 				selected: false,
-				content: e.target.value
-			}
-
-			// createTodo(todo).then(todo => setTodos([todo, ...todos]))
+				content: newTodo
+			})
 
 			setNewTodo("")
-		}
-
-		else {
-			setNewTodo(e.target.value)
 		}
 	}
 
@@ -151,52 +147,57 @@ function App() {
 
 	// Внутри return находится JS-код. Вместо class нужно использовать className.
 	return (
-		/* 
-			То, что передаём между открывающимся и закрывающимся тегом, 
-			попадает в props.children. 
+		/*
+			То, что передаём между открывающимся и закрывающимся тегом,
+			попадает в props.children.
 		*/
-		<div className="py-1 application container d-flex flex-column align-items-stretch">
-			<div className="card h-100">
-				1. Сделать чтобы по двойному клику появлялся инпут для редактирования задачи. И отредактированная задача отправлялась на сервер запросом PUT или PATCH и там обновлялась.
-				2. Доделать функции кнопок "Выполнить" и "Удалить". Чтобы при клике по ним на сервер отправлялись данные каждой выбранной задачи.
-				<AppHeader />
-				<input 
-					type="text" 
-					className="form-control" 
-					value={newTodo}
-					onChange={e => setNewTodo(e.target.value)}
-					onKeyUp={handlerNewTodo}
-				/>
-				{
-					showActions
-					? (
-						<div className="ml-auto">
-							<div className="btn-group">
-								<button 
-									type="button" 
-									className="btn btn-primary"
-									// onClick={() => setDone()}
-								>Выполнить</button>
-								<button 
-									type="button" 
-									className="btn btn-danger"
-									// onClick={() => removeSelected()}
-								>Удалить</button>
+		<Context.Provider value={{ dispatch }}>
+			<div className="py-1 application container d-flex flex-column align-items-stretch">
+				<div className="card h-100">
+					1. Сделать чтобы по двойному клику появлялся инпут для редактирования задачи. И отредактированная задача отправлялась на сервер запросом PUT или PATCH и там обновлялась.
+					2. Доделать функции кнопок "Выполнить" и "Удалить". Чтобы при клике по ним на сервер отправлялись данные каждой выбранной задачи.
+					<AppHeader />
+					<input
+						type="text"
+						className="form-control"
+						value={newTodo}
+						onChange={e => setNewTodo(e.target.value)}
+						onKeyUp={handlerNewTodo}
+					/>
+					{
+						showActions
+						? (
+							<div className="ml-auto">
+								<div className="btn-group">
+									<button
+										type="button"
+										className="btn btn-primary"
+										onClick={() => dispatch({
+											type: 'DONE',
+											payload: todos
+												.filter(todo => todo.selected)
+												.map(todo => todo.id)
+										})}
+									>Выполнить</button>
+									<button
+										type="button"
+										className="btn btn-danger"
+										// onClick={() => removeSelected()}
+									>Удалить</button>
+								</div>
 							</div>
-						</div>
-					)
-					: ""
-				}
+						)
+						: ""
+					}
 
-				{/* Элементы в функцию передаются с помощью атрибутов. */}
-				<TodoList 
-					todos={todos} 
-					dispatch={dispatch}
-					// changeTodo={changeTodo}
-				/>
+					{/* Элементы в функцию передаются с помощью атрибутов. */}
+					<TodoList
+						todos={todos}
+					/>
+				</div>
 			</div>
-		</div>
-	);
+		</Context.Provider>
+	)
 }
 
 export default App;

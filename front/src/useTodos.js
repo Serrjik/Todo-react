@@ -1,24 +1,39 @@
 // Функции для работы с todos. Пользовательский хук.
 
 import { useReducer, useEffect } from "react"
-import { getAll } from "./requestManager"
+import { getAll, createTodo, updateTodo } from "./requestManager"
 
-/* 
+/*
 	Функция reducer принимает 2 аргумента: state - текущее состояние reducer'а
-	и action, который призван изменить это состояние. 
-	У action всегда есть поле type, 
+	и action, который призван изменить это состояние.
+	У action всегда есть поле type,
 	по которому можно понять, что требуется сделать.
 */
 function reducer (state, action) {
-	console.log('action: ', action);
-
 	switch (action.type) {
 		// Полностью изменить state.
-		case 'INIT': 
+		case 'INIT':
 			return action.payload
 
+		case 'UPDATE': {
+			// Нужно вернуть полностью новое состояние, другой объект.
+			const newState = []
+
+			for (const todo of state) {
+				if (todo.id === action.payload.id) {
+					Object.assign(todo, action.payload)
+					// Изменить запись на сервере.
+					updateTodo(todo)
+				}
+
+				newState.push({ ...todo })
+			}
+
+			return newState
+		}
+
 		// Выбрать todo-элемент.
-		case 'SET_SELECT':
+		case 'SET_SELECT': {
 			// Нужно вернуть полностью новое состояние, другой объект.
 			const newState = []
 
@@ -31,23 +46,55 @@ function reducer (state, action) {
 			}
 
 			return newState
-		
+		}
+
+		case 'ADD':
+			return [action.payload, ...state]
+
+		case 'DONE': {
+			// Нужно вернуть полностью новое состояние, другой объект.
+			const newState = []
+
+			for (const todo of state) {
+				// Если todo отмечен выполненным:
+				if (action.payload.includes(todo.id)) {
+					todo.selected = false
+					todo.done = true
+					// Отметить записи на сервере как выполненные.
+					updateTodo(todo)
+				}
+
+				newState.push({ ...todo })
+			}
+
+			return newState
+		}
+
 		default:
 			return state
 	}
 }
 
 export default function useTodos () {
-	console.log('useTodos fired');
-	/* 
+	// console.log('useTodos fired');
+
+	/*
 	Хук React'а useReducer позволяет описать reducer.
-	Принимает 2 аргумента - reducer и стартовое состояние. 
+	Принимает 2 аргумента - reducer и стартовое состояние.
 	Возвращает 2 объекта - todos и dispatch.
 	dispatch - функция, которая будет вызывать reducer.
 	В функции reducer должны быть описаны все действия,
 	которые можно совершать с объектом todos.
 	*/
 	const [todos, dispatch] = useReducer(reducer, [])
+
+	// Функция принимает новый todo.
+	dispatch.create = function create (todo) {
+		createTodo(todo).then(todo => dispatch({
+			type: "ADD",
+			payload: todo
+		}))
+	}
 
 	useEffect(
 		() => {
