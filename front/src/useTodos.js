@@ -1,7 +1,7 @@
 // Функции для работы с todos. Пользовательский хук.
 
 import { useReducer, useEffect } from "react"
-import { getAll, createTodo, updateTodo } from "./requestManager"
+import { getAll, createTodo, updateTodo, removeTodo } from "./requestManager"
 
 /*
 	Функция reducer принимает 2 аргумента: state - текущее состояние reducer'а
@@ -11,10 +11,11 @@ import { getAll, createTodo, updateTodo } from "./requestManager"
 */
 function reducer (state, action) {
 	switch (action.type) {
-		// Полностью изменить state.
+		// Полностью изменить state (инициализировать хранилище).
 		case 'INIT':
 			return action.payload
 
+		// Обновить состояние хранилища.
 		case 'UPDATE': {
 			// Нужно вернуть полностью новое состояние, другой объект.
 			const newState = []
@@ -32,7 +33,7 @@ function reducer (state, action) {
 			return newState
 		}
 
-		// Выбрать todo-элемент.
+		// Выбрать todo-элемент и изменить его состояние в хранилище.
 		case 'SET_SELECT': {
 			// Нужно вернуть полностью новое состояние, другой объект.
 			const newState = []
@@ -48,16 +49,18 @@ function reducer (state, action) {
 			return newState
 		}
 
+		// Создание новой записи.
 		case 'ADD':
 			return [action.payload, ...state]
 
+		// Установить запись выполненной.
 		case 'DONE': {
 			// Нужно вернуть полностью новое состояние, другой объект.
 			const newState = []
 
 			for (const todo of state) {
 				// Если todo отмечен выполненным:
-				if (action.payload.includes(todo.id)) {
+				if (todo.selected) {
 					todo.selected = false
 					todo.done = true
 					// Отметить записи на сервере как выполненные.
@@ -65,6 +68,29 @@ function reducer (state, action) {
 				}
 
 				newState.push({ ...todo })
+			}
+
+			return newState
+		}
+
+		case 'REMOVE': {
+			// Нужно вернуть полностью новое состояние, другой объект.
+			const newState = []
+
+			for (const todo of state) {
+				// Если todo входит в элементы, выбранные для удаления:
+				if (todo.selected) {
+					// Удалить записи на сервере.
+					removeTodo(todo) }
+
+				/*
+					Вернуть только те элементы,
+					которые не были выбраны для удаления.
+				*/
+				else {
+					newState.push({ ...todo })
+				}
+
 			}
 
 			return newState
@@ -98,10 +124,12 @@ export default function useTodos () {
 
 	useEffect(
 		() => {
-			getAll().then(todos => dispatch({
-				type: 'INIT',
-				payload: todos
-			}))
+			;(async () => {
+				getAll().then(todos => dispatch({
+					type: 'INIT',
+					payload: todos
+				}))
+			})();
 		},
 		[]
 	)

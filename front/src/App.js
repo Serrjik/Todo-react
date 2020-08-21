@@ -1,7 +1,7 @@
-import React, {useState, useEffect, createContext } from 'react';
+import React, {useState, useEffect } from 'react';
 import AppHeader from './AppHeader';
 import TodoList from './TodoList';
-import { getAll, createTodo, updateTodo, removeTodo } from './requestManager';
+// import { updateTodo } from './requestManager';
 
 import useTodos from './useTodos';
 import Context from './Context';
@@ -81,16 +81,16 @@ function App() {
 		Функция обрабатывает завершение редактирования задачи
 		(по потере фокуса, или нажатию "Enter").
 	*/
-	const changeTodo = (todoId, value) => {
-		const todo = todos.find(todo => todo.id === todoId)
-		todo.edited = !todo.edited
-		todo.content = value
+	// const changeTodo = (todoId, value) => {
+	// 	const todo = todos.find(todo => todo.id === todoId)
+	// 	todo.edited = !todo.edited
+	// 	todo.content = value
 
-		updateTodo(todo)
+	// 	updateTodo(todo)
 
-		// В функцию setTodos нужно передавать новый массив.
-		// setTodos([...todos])
-	}
+	// 	// В функцию setTodos нужно передавать новый массив.
+	// 	// setTodos([...todos])
+	// }
 
 	// Функция делает выбранные задания выполненными.
 	// const setDone = () => {
@@ -154,8 +154,6 @@ function App() {
 		<Context.Provider value={{ dispatch }}>
 			<div className="py-1 application container d-flex flex-column align-items-stretch">
 				<div className="card h-100">
-					1. Сделать чтобы по двойному клику появлялся инпут для редактирования задачи. И отредактированная задача отправлялась на сервер запросом PUT или PATCH и там обновлялась.
-					2. Доделать функции кнопок "Выполнить" и "Удалить". Чтобы при клике по ним на сервер отправлялись данные каждой выбранной задачи.
 					<AppHeader />
 					<input
 						type="text"
@@ -172,17 +170,12 @@ function App() {
 									<button
 										type="button"
 										className="btn btn-primary"
-										onClick={() => dispatch({
-											type: 'DONE',
-											payload: todos
-												.filter(todo => todo.selected)
-												.map(todo => todo.id)
-										})}
+										onClick={() => dispatch({ type: "DONE" })}
 									>Выполнить</button>
 									<button
 										type="button"
 										className="btn btn-danger"
-										// onClick={() => removeSelected()}
+										onClick={() => dispatch({ type: "REMOVE" })}
 									>Удалить</button>
 								</div>
 							</div>

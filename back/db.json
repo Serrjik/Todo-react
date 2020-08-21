@@ -1,29 +1,10 @@
 {
   "todoItems": [
     {
-      "done": true,
+      "done": false,
       "selected": false,
-      "content": "Купить сахар в пакете",
-      "id": 1,
-      "edited": false
-    },
-    {
-      "done": true,
-      "selected": false,
-      "content": "Уехать из страны - раз",
-      "id": 2
-    },
-    {
-      "done": true,
-      "selected": false,
-      "content": "Удариться в бега - два",
-      "id": 3
-    },
-    {
-      "done": true,
-      "selected": false,
-      "content": "Покормить кота",
-      "id": 4
+      "content": "Накормить кота",
+      "id": 1
     }
   ]
 }
