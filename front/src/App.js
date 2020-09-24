@@ -126,7 +126,8 @@ function App() {
 				// id: 1 + Math.max(0, ...todos.map(todo => todo.id)),
 				done: false,
 				selected: false,
-				content: newTodo
+				content: newTodo,
+				date: Date.now()
 			})
 
 			setNewTodo("")

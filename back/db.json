@@ -1,10 +1,32 @@
 {
   "todoItems": [
     {
-      "done": false,
+      "done": true,
+      "selected": false,
+      "content": "Дописать Todo application",
+      "date": 1600939699152,
+      "id": 3
+    },
+    {
+      "done": true,
       "selected": false,
       "content": "Накормить кота",
-      "id": 1
+      "date": 1600940626727,
+      "id": 4
+    },
+    {
+      "done": false,
+      "selected": false,
+      "content": "Уехать из страны",
+      "date": 1600940633848,
+      "id": 5
+    },
+    {
+      "done": false,
+      "selected": false,
+      "content": "Удариться в бега",
+      "date": 1600940639397,
+      "id": 6
     }
   ]
 }
